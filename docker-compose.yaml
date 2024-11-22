@@ -14,6 +14,11 @@ services:
     container_name: canado
     ports:
       - 8888:8888
+    restart: always
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 

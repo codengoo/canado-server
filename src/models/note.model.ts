@@ -6,7 +6,7 @@ export default class NoteModel {
       data: {
         title,
         content,
-      }
+      },
     });
 
     return note;
@@ -16,5 +16,18 @@ export default class NoteModel {
     const notes = await database.note.findMany();
 
     return notes;
+  }
+
+  static async updateNoteStatus(id: string, status: any) {
+    const note = await database.note.update({
+      where: {
+        id,
+      },
+      data: {
+        state: status,
+      },
+    });
+
+    return note;
   }
 }
