@@ -1,4 +1,4 @@
-import database from '../utils/database';
+import database from '../configs/database';
 
 export default class NoteModel {
   static async createNote(title: string, content: string) {
@@ -6,23 +6,14 @@ export default class NoteModel {
       data: {
         title,
         content,
-      },
-      select: {
-        id: true,
-      },
+      }
     });
 
     return note;
   }
 
   static async getNotes() {
-    const notes = await database.note.findMany({
-      select: {
-        id: true,
-        title: true,
-        content: true,
-      },
-    });
+    const notes = await database.note.findMany();
 
     return notes;
   }
