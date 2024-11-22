@@ -12,6 +12,6 @@ WORKDIR /app
 COPY --from=builder /app/build .
 
 RUN npm install --omit=dev
-# EXPOSE 3000
+EXPOSE 8888
 
-# ENTRYPOINT [ "npm", "run", "start" ]
+ENTRYPOINT [ "node", "server.js" ]
