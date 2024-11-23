@@ -14,6 +14,7 @@ export async function handleExceptions(
         data: null,
       });
     } else {
+      console.log(error);
       res.status(500).json({
         message: 'Unknown error',
         data: null,

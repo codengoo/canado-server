@@ -1,4 +1,5 @@
 import database from '../configs/database';
+import { ENoteState } from '../data';
 
 export default class NoteModel {
   static async createNote(title: string, content: string) {
@@ -18,13 +19,13 @@ export default class NoteModel {
     return notes;
   }
 
-  static async updateNoteStatus(id: string, status: any) {
+  static async updateNoteStatus(id: string, status: ENoteState) {
     const note = await database.note.update({
       where: {
         id,
       },
       data: {
-        state: status,
+        state: (status as any).toUpperCase(),
       },
     });
 

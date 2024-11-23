@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
+import { ENoteState } from '../data';
 import NoteModel from '../models/note.model';
 import { handleExceptions } from '../utils';
 import ValidationError from '../utils/valError';
-import { isNullOrEmpty } from '../validations/base.validation';
+import {
+  isInEnum,
+  isNullOrEmpty,
+  isObjectId,
+} from '../validations/base.validation';
 
 export default class NoteController {
   static async GetNote(req: Request, res: Response) {
@@ -26,16 +31,16 @@ export default class NoteController {
   }
 
   static async UpdateNoteStatus(req: Request, res: Response) {
-    const { status } = req.body as { status: any };
+    const { status } = req.body as { status: ENoteState };
     const { id } = req.params;
 
     await handleExceptions(res, async () => {
-      if (isNullOrEmpty(id)) {
-        throw new ValidationError('id is not provided');
+      if (!isObjectId(id)) {
+        throw new ValidationError('id is invalid or not provided');
       }
 
-      if (isNullOrEmpty(status)) {
-        throw new ValidationError('status must be provided');
+      if (!isInEnum(status, ENoteState)) {
+        throw new ValidationError('status is invalid or not provided');
       }
 
       const note = await NoteModel.updateNoteStatus(id, status);
