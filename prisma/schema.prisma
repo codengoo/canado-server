@@ -18,5 +18,5 @@ model Note {
 
 enum NoteType {
   ON_GOING
-  COMPLETE
+  COMPLETED
 }
