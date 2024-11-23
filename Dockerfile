@@ -4,7 +4,7 @@ WORKDIR /app
 COPY . .
 
 RUN npm install
-RUN npm run db:generator
+RUN npm run db:gen
 RUN npm run build
 
 FROM node:20-alpine
