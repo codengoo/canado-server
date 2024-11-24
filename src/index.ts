@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Express } from 'express';
+import session from 'express-session';
 import helmet from 'helmet';
 import { applyRoute } from './routes';
 
@@ -16,6 +17,14 @@ app.use(cookieParser());
 
 app.use(cors());
 app.use(helmet());
+
+app.use(
+  session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
 
 applyRoute(app);
 
