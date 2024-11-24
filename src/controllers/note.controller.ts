@@ -10,14 +10,14 @@ import {
 } from '../validations/base.validation';
 
 export default class NoteController {
-  static async GetNote(req: Request, res: Response) {
+  static async getNote(req: Request, res: Response) {
     await handleExceptions(res, async () => {
       const notes = await NoteModel.getNotes();
       res.json({ message: 'Ok', data: notes });
     });
   }
 
-  static async CreateNote(req: Request, res: Response) {
+  static async createNote(req: Request, res: Response) {
     const { title, content } = req.body as { title: string; content: string };
 
     await handleExceptions(res, async () => {
@@ -30,7 +30,7 @@ export default class NoteController {
     });
   }
 
-  static async UpdateNoteStatus(req: Request, res: Response) {
+  static async updateNoteStatus(req: Request, res: Response) {
     const { status } = req.body as { status: ENoteState };
     const { id } = req.params;
 
