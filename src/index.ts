@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import express, { Express } from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
+import passport from 'passport';
 import { applyRoute } from './routes';
 
 dotenv.config();
@@ -25,6 +26,7 @@ app.use(
     saveUninitialized: false,
   }),
 );
+app.use(passport.authenticate('session'));
 
 applyRoute(app);
 

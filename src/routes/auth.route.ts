@@ -17,6 +17,6 @@ router.get(
 );
 
 router.get('/success/deeplink', AuthController.openDeepLink);
-router.get('/failure', AuthController.openDeepLink);
+router.get('/failure', AuthController.failed);
 
 export default router;

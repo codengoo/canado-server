@@ -10,7 +10,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      // callbackURL: '/auth/google/redirect',   
+      // callbackURL: '/auth/google/redirect',
       callbackURL: 'http://api.nacado.nghiacangao.io.vn/auth/google/redirect',
     },
     async (accessToken, refreshToken, profile, cb) => {
