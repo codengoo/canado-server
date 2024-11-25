@@ -13,8 +13,18 @@ export default class NoteModel {
     return note;
   }
 
-  static async getNotes() {
-    const notes = await database.note.findMany();
+  static async getNotes(
+    state?: ENoteState,
+    offset: number = 0,
+    limit: number = 100,
+  ) {
+    const notes = await database.note.findMany({
+      where: {
+        state: state ? (state as any).toUpperCase() : undefined,
+      },
+      skip: offset,
+      take: limit,
+    });
 
     return notes;
   }
