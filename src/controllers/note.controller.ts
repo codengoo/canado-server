@@ -11,8 +11,23 @@ import {
 
 export default class NoteController {
   static async getNote(req: Request, res: Response) {
+    const { status, limit, offset } = req.query;
+
     await handleExceptions(res, async () => {
-      const notes = await NoteModel.getNotes();
+      if (status && !isInEnum(status, ENoteState))
+        throw new ValidationError('Invalid status param');
+
+      if (limit && isNaN(Number(limit)))
+        throw new ValidationError('Invalid limit param');
+
+      if (limit && isNaN(Number(offset)))
+        throw new ValidationError('Invalid offset param');
+
+      const notes = await NoteModel.getNotes(
+        status as ENoteState,
+        offset && Number(offset),
+        limit && Number(limit),
+      );
       res.json({ message: 'Ok', data: notes });
     });
   }
