@@ -4,6 +4,7 @@ import { IUser } from '../data';
 import UserModel from '../models/user.model';
 import { handleExceptions } from '../utils';
 import ValidationError from '../utils/valError';
+import { isNullOrEmpty } from '../validations/base.validation';
 
 export default class AuthController {
   static async openDeepLink(req: Request, res: Response) {
@@ -12,7 +13,7 @@ export default class AuthController {
 
     await handleExceptions(res, async () => {
       // const user = req.user as IUser;
-      
+
       // TODO: remove on product
       const user =
         (req.user as IUser) || (id && (await UserModel.getUserByID(id)));
@@ -27,6 +28,23 @@ export default class AuthController {
   static async failed(req: Request, res: Response) {
     await handleExceptions(res, async () => {
       res.status(401).json({ message: 'Unauthorized' });
+    });
+  }
+
+  static async checkLogin(req: Request, res: Response) {
+    const { token } = req.cookies;
+
+    await handleExceptions(res, async () => {
+      if (isNullOrEmpty(token)) {
+        res.json(401).json({ message: 'Unthorization' });
+      }
+
+      try {
+        const user = jwt.verify(token, process.env.JWT_TOKEN);
+        res.json({ message: 'Ok', user: user });
+      } catch (error) {
+        res.json(401).json({ message: 'Unthorization' });
+      }
     });
   }
 }
