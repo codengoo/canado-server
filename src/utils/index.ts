@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import ValidationError from './valError';
+import { AuthorizationError, ValidationError } from './error';
 
 export async function handleExceptions(
   res: Response,
@@ -10,6 +10,11 @@ export async function handleExceptions(
   } catch (error) {
     if (error instanceof ValidationError) {
       res.status(400).json({
+        message: error.message,
+        data: null,
+      });
+    } else if (error instanceof AuthorizationError) {
+      res.status(401).json({
         message: error.message,
         data: null,
       });

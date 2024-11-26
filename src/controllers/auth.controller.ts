@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { IUser } from '../data';
 import UserModel from '../models/user.model';
 import { handleExceptions } from '../utils';
-import ValidationError from '../utils/valError';
+import { AuthorizationError, ValidationError } from '../utils/error';
 import { isNullOrEmpty } from '../validations/base.validation';
 
 export default class AuthController {
@@ -28,6 +28,7 @@ export default class AuthController {
   static async failed(req: Request, res: Response) {
     await handleExceptions(res, async () => {
       res.status(401).json({ message: 'Unauthorized' });
+      throw new AuthorizationError();
     });
   }
 
@@ -36,14 +37,14 @@ export default class AuthController {
 
     await handleExceptions(res, async () => {
       if (isNullOrEmpty(token)) {
-        res.json(401).json({ message: 'Unthorization' });
+        throw new AuthorizationError();
       }
 
       try {
         const user = jwt.verify(token, process.env.JWT_TOKEN);
         res.json({ message: 'Ok', user: user });
       } catch (error) {
-        res.json(401).json({ message: 'Unthorization' });
+        throw new AuthorizationError();
       }
     });
   }

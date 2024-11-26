@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ENoteState } from '../data';
 import NoteModel from '../models/note.model';
 import { handleExceptions } from '../utils';
-import ValidationError from '../utils/valError';
+import { ValidationError } from '../utils/error';
 import {
   isInEnum,
   isNullOrEmpty,
