@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { AuthorizationError, ValidationError } from './error';
 
 export async function handleExceptions(
-  res: Response,
+  res: Response<ResponseData>,
   func: () => Promise<void>,
 ) {
   try {
@@ -26,4 +26,10 @@ export async function handleExceptions(
       });
     }
   }
+}
+
+export interface ResponseData<T = any> {
+  message: string;
+  data?: T;
+  errors?: string[];
 }

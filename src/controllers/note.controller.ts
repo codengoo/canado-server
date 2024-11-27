@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ENoteState } from '../data';
 import NoteModel from '../models/note.model';
-import { handleExceptions } from '../utils';
+import { handleExceptions, ResponseData } from '../utils';
 import { ValidationError } from '../utils/error';
 import {
   isInEnum,
@@ -10,7 +10,7 @@ import {
 } from '../validations/base.validation';
 
 export default class NoteController {
-  static async getNote(req: Request, res: Response) {
+  static async getNote(req: Request, res: Response<ResponseData>) {
     const { status, limit, offset } = req.query;
 
     await handleExceptions(res, async () => {
@@ -32,7 +32,7 @@ export default class NoteController {
     });
   }
 
-  static async createNote(req: Request, res: Response) {
+  static async createNote(req: Request, res: Response<ResponseData>) {
     const { title, content } = req.body as { title: string; content: string };
 
     await handleExceptions(res, async () => {
@@ -45,7 +45,7 @@ export default class NoteController {
     });
   }
 
-  static async updateNoteStatus(req: Request, res: Response) {
+  static async updateNoteStatus(req: Request, res: Response<ResponseData>) {
     const { status } = req.body as { status: ENoteState };
     const { id } = req.params;
 
