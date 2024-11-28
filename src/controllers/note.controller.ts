@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ENoteState } from '../data';
+import { ENoteState, IUser } from '../data';
 import NoteModel from '../models/note.model';
 import { handleExceptions, ResponseData } from '../utils';
 import { ValidationError } from '../utils/error';
@@ -34,13 +34,14 @@ export default class NoteController {
 
   static async createNote(req: Request, res: Response<ResponseData>) {
     const { title, content } = req.body as { title: string; content: string };
+    const { id } = req.user as IUser;
 
     await handleExceptions(res, async () => {
       if (isNullOrEmpty(title) || isNullOrEmpty(content)) {
         throw new ValidationError('title or content is not null or empty');
       }
 
-      const note = await NoteModel.createNote(title, content);
+      const note = await NoteModel.createNote(title, content, id);
       res.json({ message: 'Created', data: note });
     });
   }

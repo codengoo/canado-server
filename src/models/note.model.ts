@@ -2,11 +2,12 @@ import database from '../configs/database';
 import { ENoteState } from '../data';
 
 export default class NoteModel {
-  static async createNote(title: string, content: string) {
+  static async createNote(title: string, content: string, id: string) {
     const note = await database.note.create({
       data: {
         title,
         content,
+        userId: id,
       },
     });
 

@@ -3,7 +3,8 @@ import jwt from 'jsonwebtoken';
 import { IUser } from '../data';
 import UserModel from '../models/user.model';
 import { handleExceptions, ResponseData } from '../utils';
-import { AuthorizationError, ValidationError } from '../utils/error';
+import { AuthorizationError } from '../utils/error';
+import { generateToken } from '../utils/jwt';
 import { isNullOrEmpty } from '../validations/base.validation';
 
 export default class AuthController {
@@ -18,10 +19,25 @@ export default class AuthController {
       const user =
         (req.user as IUser) || (id && (await UserModel.getUserByID(id)));
 
-      if (!user) throw new ValidationError('Invalid user');
-      const token = jwt.sign(user, process.env.JWT_TOKEN);
-      const refresh = jwt.sign(user, process.env.JWT_REFRESH);
+      const { token, refresh } = generateToken(user);
       res.redirect(`nacado://auth?token=${token}&refresh=${refresh}`);
+    });
+  }
+
+  static async writeCookie(req: Request, res: Response<ResponseData>) {
+    // patch: Remove on production
+    const id = req.query.id as string;
+
+    await handleExceptions(res, async () => {
+      // TODO: remove on product
+      // const user = req.user as IUser;
+      const user =
+        (req.user as IUser) || (id && (await UserModel.getUserByID(id)));
+
+      const { token, refresh } = generateToken(user);
+      res.cookie('token', token);
+      res.cookie('refresh', refresh);
+      res.json({ message: 'Ok', data: { token, refresh } });
     });
   }
 

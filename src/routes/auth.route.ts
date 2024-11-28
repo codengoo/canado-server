@@ -17,6 +17,7 @@ router.get(
 );
 
 router.get('/success/deeplink', AuthController.openDeepLink);
+router.get('/success', AuthController.writeCookie);
 router.get('/failure', AuthController.failed);
 router.get('/', AuthController.checkLogin);
 

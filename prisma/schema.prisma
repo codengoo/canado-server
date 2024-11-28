@@ -8,17 +8,28 @@ datasource db {
 }
 
 model Note {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
   title     String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  state     NoteType @default(ON_GOING)
+  content   String       @default("")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  state     NoteType     @default(ON_GOING)
+  owner     User         @relation(fields: [userId], references: [id])
+  userId    String       @db.ObjectId
+  tags      String[]     @default([])
+  priority  NotePriority @default(LOW)
 }
 
 enum NoteType {
   ON_GOING
   COMPLETED
+}
+
+enum NotePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }
 
 model User {
@@ -28,4 +39,5 @@ model User {
   email       String @unique
   displayName String
   avatar      String
+  Note        Note[]
 }
