@@ -18,6 +18,9 @@ model Note {
   userId    String       @db.ObjectId
   tags      String[]     @default([])
   priority  NotePriority @default(LOW)
+  subItems  NoteItem[]
+  Folder    Folder?      @relation(fields: [folderId], references: [id])
+  folderId  String?      @db.ObjectId
 }
 
 enum NoteType {
@@ -32,12 +35,36 @@ enum NotePriority {
   URGENT
 }
 
+type NoteItem {
+  id    String
+  title String
+}
+
 model User {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  sub         String @unique
-  username    String @unique
-  email       String @unique
-  displayName String
-  avatar      String
-  Note        Note[]
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  sub            String          @unique
+  username       String          @unique
+  email          String          @unique
+  displayName    String
+  avatar         String
+  Note           Note[]
+  Folder         Folder[]
+  UserPreference UserPreference?
+}
+
+model Folder {
+  id                String           @id @default(auto()) @map("_id") @db.ObjectId
+  note              Note[]
+  owner             User             @relation(fields: [userId], references: [id])
+  userId            String           @unique @db.ObjectId
+  UserPreferences   UserPreference[] @relation(fields: [userPreferenceIds], references: [id])
+  userPreferenceIds String[]         @db.ObjectId
+}
+
+model UserPreference {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String   @unique @db.ObjectId
+  sharedFolders   Folder[] @relation(fields: [sharedFolderIds], references: [id])
+  sharedFolderIds String[] @db.ObjectId
 }
