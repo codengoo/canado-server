@@ -7,22 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Note {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  content   String       @default("")
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  status    NoteType     @default(ON_GOING)
-  owner     User         @relation(fields: [userId], references: [id])
-  userId    String       @db.ObjectId
-  tags      String[]     @default([])
-  priority  NotePriority @default(LOW)
-  subItems  NoteItem[]
-  Folder    Folder?      @relation(fields: [folderId], references: [id])
-  folderId  String?      @db.ObjectId
-}
-
 enum NoteType {
   ON_GOING
   COMPLETED
@@ -39,6 +23,22 @@ type NoteItem {
   title String
 }
 
+model Note {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String       @default("")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  status    NoteType     @default(ON_GOING)
+  owner     User         @relation(fields: [userId], references: [id])
+  userId    String       @db.ObjectId
+  tags      String[]     @default([])
+  priority  NotePriority @default(LOW)
+  subItems  NoteItem[]
+  Folder    Folder?      @relation(fields: [folderId], references: [id])
+  folderId  String?      @db.ObjectId
+}
+
 model User {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
   sub            String          @unique
@@ -53,6 +53,8 @@ model User {
 
 model Folder {
   id                String           @id @default(auto()) @map("_id") @db.ObjectId
+  color             String
+  icon              String
   note              Note[]
   owner             User             @relation(fields: [userId], references: [id])
   userId            String           @unique @db.ObjectId

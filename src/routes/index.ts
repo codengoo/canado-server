@@ -5,6 +5,7 @@ import NoteRouter from './note.route';
 
 export function applyRoute(app: Express) {
   app.use('/note', NoteRouter);
+  app.use('/folder', NoteRouter);
   app.use('/auth', AuthRouter);
   app.use('/dev', DevRouter);
 }

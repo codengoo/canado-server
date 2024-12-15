@@ -11,8 +11,8 @@ import {
   isValidString,
 } from '../validations/base.validation';
 
-export class NoteController {
-  static async getNote(req: Request, res: Response<ResponseData>) {
+export class FolderController {
+  static async getFolder(req: Request, res: Response<ResponseData>) {
     const { status, limit, offset } = req.query;
 
     await handleExceptions(res, async () => {
@@ -29,7 +29,7 @@ export class NoteController {
     });
   }
 
-  static async createNote(req: Request, res: Response<ResponseData>) {
+  static async createFolder(req: Request, res: Response<ResponseData>) {
     const { title, content, ref, folderId, priority } =
       req.body as ICreateNotePayload;
     const { id: userId } = req.user as IUser;
@@ -49,7 +49,7 @@ export class NoteController {
     });
   }
 
-  static async updateNote(req: Request, res: Response<ResponseData>) {
+  static async updateFolder(req: Request, res: Response<ResponseData>) {
     const { content, folderId, priority, status, title } =
       req.body as IUpdateNotePayload;
     const { id } = req.params;
@@ -70,7 +70,7 @@ export class NoteController {
     });
   }
 
-  static async deleteNote(req: Request, res: Response<ResponseData>) {
+  static async deleteFolder(req: Request, res: Response<ResponseData>) {
     const { id } = req.params;
     const { id: userId } = req.user as IUser;
 
