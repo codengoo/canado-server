@@ -1,4 +1,9 @@
 import { ENotePriority, ENoteStatus } from '../data';
+import { IGetQueryPayload } from './common';
+
+export interface IGetNotePayload extends IGetQueryPayload {
+  status?: ENoteStatus;
+}
 
 export interface ICreateNotePayload {
   title: string;

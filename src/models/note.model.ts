@@ -1,8 +1,8 @@
 import database from '../configs/database';
-import { ENoteStatus } from '../data';
 import {
   ICreateNotePayload,
   IDeleteNotePayload,
+  IGetNotePayload,
   IUpdateNotePayload,
 } from '../types/note';
 
@@ -22,26 +22,27 @@ export default class NoteModel {
     return note;
   }
 
-  static async getNotes(
-    status?: ENoteStatus,
-    offset: number = 0,
-    limit: number = 100,
-  ) {
+  static async getNotes(payload: IGetNotePayload & { userId: string }) {
     const notes = await database.note.findMany({
       where: {
-        status: status,
+        status: payload.status,
+        userId: payload.userId,
       },
-      skip: offset,
-      take: limit,
+      skip: payload.offset,
+      take: payload.limit,
     });
 
     return notes;
   }
 
-  static async updateNote(id: string, payload: IUpdateNotePayload) {
+  static async updateNote(
+    id: string,
+    payload: IUpdateNotePayload & { userId: string },
+  ) {
     const note = await database.note.update({
       where: {
         id,
+        userId: payload.userId,
       },
       data: {
         title: payload.title,

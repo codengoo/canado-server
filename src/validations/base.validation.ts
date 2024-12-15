@@ -4,6 +4,7 @@ interface ICheckOption {
   isThrowError?: boolean;
   valueName: string;
   nullable?: boolean;
+  dataType?: 'array' | 'member' | 'value';
 }
 
 function isDef(value: any): boolean {
@@ -21,11 +22,22 @@ function checkFn(
       else throw new ValidationError('must be provided');
     }
 
-    fn();
+    if (option?.dataType === 'array') {
+      if (!Array.isArray(value)) throw new ValidationError('must be an array');
+      value.forEach((item) =>
+        checkFn(item, { ...option, dataType: 'member' }, fn),
+      );
+    } else fn();
+
     return true;
   } catch (error) {
     const err = error as ValidationError;
-    err.message = (option?.valueName || 'Value') + ' ' + error.message;
+    err.message =
+      option?.dataType === 'member'
+        ? (option?.valueName || 'Value') +
+          ' must be an array and all members ' +
+          error.message
+        : (option?.valueName || 'Value') + ' ' + error.message;
 
     if (!option || option.isThrowError === undefined || option.isThrowError)
       throw error;
@@ -51,7 +63,7 @@ export function isInEnum(
     isValidString(value, option);
 
     if (!Object.values(enumType).includes(value))
-      throw new ValidationError('is invalid value in enum');
+      throw new ValidationError('must be a value in enum');
   });
 }
 
@@ -60,6 +72,7 @@ export function isObjectId(value: any, option?: ICheckOption): boolean {
     isValidString(value, option);
 
     const objectIdRegex = /^[a-fA-F0-9]{24}$/;
+
     if (!objectIdRegex.test(value))
       throw new ValidationError('must be an objectId');
   });
@@ -72,6 +85,26 @@ export function isUUIDv4(value: any, option?: ICheckOption) {
     const uuidV4Regex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     if (!uuidV4Regex.test(value)) throw new ValidationError('must be an uuid');
+  });
+}
+
+export function isHexColor(value: any, option?: ICheckOption) {
+  return checkFn(value, option, () => {
+    isValidString(value, option);
+
+    const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+    if (!hexColorRegex.test(value))
+      throw new ValidationError('must be an hex color value');
+  });
+}
+
+export function isIcon(value: any, option?: ICheckOption) {
+  return checkFn(value, option, () => {
+    isValidString(value, option);
+
+    const hexColorRegex = /Tb.*/;
+    if (!hexColorRegex.test(value))
+      throw new ValidationError('must be an icon');
   });
 }
 

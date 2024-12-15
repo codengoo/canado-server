@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { ENotePriority, ENoteStatus, IUser } from '../data';
 import NoteModel from '../models/note.model';
-import { ICreateNotePayload, IUpdateNotePayload } from '../types/note';
+import {
+  ICreateNotePayload,
+  IGetNotePayload,
+  IUpdateNotePayload,
+} from '../types/note';
 import { handleExceptions, ResponseData } from '../utils';
 import {
   isInEnum,
@@ -13,18 +17,20 @@ import {
 
 export class NoteController {
   static async getNote(req: Request, res: Response<ResponseData>) {
-    const { status, limit, offset } = req.query;
+    const { status, limit, offset } = req.query as IGetNotePayload;
+    const { id: userId } = req.user as IUser;
 
     await handleExceptions(res, async () => {
       isInEnum(status, ENoteStatus, { valueName: 'status', nullable: true });
       isNumber(limit, { valueName: 'limit', nullable: true });
       isNumber(offset, { valueName: 'offset', nullable: true });
 
-      const notes = await NoteModel.getNotes(
-        status as ENoteStatus,
-        offset && Number(offset),
-        limit && Number(limit),
-      );
+      const notes = await NoteModel.getNotes({
+        status: status as ENoteStatus,
+        offset: offset ? Number(offset) : 0,
+        limit: limit ? Number(limit) : 100,
+        userId: userId,
+      });
       res.json({ message: 'Ok', data: notes });
     });
   }
@@ -53,6 +59,7 @@ export class NoteController {
     const { content, folderId, priority, status, title } =
       req.body as IUpdateNotePayload;
     const { id } = req.params;
+    const { id: userId } = req.user as IUser;
 
     await handleExceptions(res, async () => {
       isValidString(content, { valueName: 'content', nullable: true });
@@ -65,7 +72,10 @@ export class NoteController {
       isInEnum(status, ENoteStatus, { valueName: 'status', nullable: true });
       isObjectId(id, { valueName: 'id', nullable: true });
 
-      const note = await NoteModel.updateNote(id, req.body);
+      const note = await NoteModel.updateNote(id, {
+        ...req.body,
+        userId: userId,
+      });
       res.json({ message: 'Updated', data: note });
     });
   }
@@ -76,8 +86,8 @@ export class NoteController {
 
     await handleExceptions(res, async () => {
       isObjectId(id, { valueName: 'id', nullable: true });
-      await NoteModel.deleteNote(id, { userId });
-      res.json({ message: 'Deleted' });
+      const note = await NoteModel.deleteNote(id, { userId });
+      res.json({ message: 'Deleted', data: note });
     });
   }
 }
