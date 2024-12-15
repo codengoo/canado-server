@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
-import { ENoteState, IUser } from '../data';
+import { ENotePriority, ENoteStatus, IUser } from '../data';
 import NoteModel from '../models/note.model';
+import { ICreateNotePayload, IUpdateNotePayload } from '../types/note';
 import { handleExceptions, ResponseData } from '../utils';
-import { ValidationError } from '../utils/error';
 import {
   isInEnum,
-  isNullOrEmpty,
+  isNumber,
   isObjectId,
+  isUUIDv4,
+  isValidString,
 } from '../validations/base.validation';
 
 export default class NoteController {
@@ -14,17 +16,12 @@ export default class NoteController {
     const { status, limit, offset } = req.query;
 
     await handleExceptions(res, async () => {
-      if (status && !isInEnum(status, ENoteState))
-        throw new ValidationError('Invalid status param');
-
-      if (limit && isNaN(Number(limit)))
-        throw new ValidationError('Invalid limit param');
-
-      if (limit && isNaN(Number(offset)))
-        throw new ValidationError('Invalid offset param');
+      isInEnum(status, ENoteStatus, { valueName: 'status', nullable: true });
+      isNumber(limit, { valueName: 'limit', nullable: true });
+      isNumber(offset, { valueName: 'offset', nullable: true });
 
       const notes = await NoteModel.getNotes(
-        status as ENoteState,
+        status as ENoteStatus,
         offset && Number(offset),
         limit && Number(limit),
       );
@@ -33,34 +30,54 @@ export default class NoteController {
   }
 
   static async createNote(req: Request, res: Response<ResponseData>) {
-    const { title, content } = req.body as { title: string; content: string };
-    const { id } = req.user as IUser;
+    const { title, content, ref, folderId, priority } =
+      req.body as ICreateNotePayload;
+    const { id: userId } = req.user as IUser;
 
     await handleExceptions(res, async () => {
-      if (isNullOrEmpty(title) || isNullOrEmpty(content)) {
-        throw new ValidationError('title or content is not null or empty');
-      }
+      isValidString(title, { valueName: 'title' });
+      isValidString(content, { valueName: 'content' });
+      isUUIDv4(ref, { valueName: 'ref' });
+      isObjectId(folderId, { valueName: 'folderId', nullable: true });
+      isInEnum(priority, ENotePriority, {
+        valueName: 'priority',
+        nullable: true,
+      });
 
-      const note = await NoteModel.createNote(title, content, id);
-      res.json({ message: 'Created', data: note });
+      const note = await NoteModel.createNote({ ...req.body, userId });
+      res.json({ message: 'Created', data: { ...note, ref } });
     });
   }
 
-  static async updateNoteStatus(req: Request, res: Response<ResponseData>) {
-    const { status } = req.body as { status: ENoteState };
+  static async updateNote(req: Request, res: Response<ResponseData>) {
+    const { content, folderId, priority, status, title } =
+      req.body as IUpdateNotePayload;
     const { id } = req.params;
 
     await handleExceptions(res, async () => {
-      if (!isObjectId(id)) {
-        throw new ValidationError('id is invalid or not provided');
-      }
+      isValidString(content, { valueName: 'content', nullable: true });
+      isObjectId(folderId, { valueName: 'folderId', nullable: true });
+      isInEnum(priority, ENotePriority, {
+        valueName: 'priority',
+        nullable: true,
+      });
+      isValidString(title, { valueName: 'title', nullable: true });
+      isInEnum(status, ENoteStatus, { valueName: 'status', nullable: true });
+      isObjectId(id, { valueName: 'id', nullable: true });
 
-      if (!isInEnum(status, ENoteState)) {
-        throw new ValidationError('status is invalid or not provided');
-      }
-
-      const note = await NoteModel.updateNoteStatus(id, status);
+      const note = await NoteModel.updateNote(id, req.body);
       res.json({ message: 'Updated', data: note });
+    });
+  }
+
+  static async deleteNote(req: Request, res: Response<ResponseData>) {
+    const { id } = req.params;
+    const { id: userId } = req.user as IUser;
+
+    await handleExceptions(res, async () => {
+      isObjectId(id, { valueName: 'id', nullable: true });
+      await NoteModel.deleteNote(id, { userId });
+      res.json({ message: 'Deleted' });
     });
   }
 }

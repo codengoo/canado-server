@@ -5,7 +5,7 @@ import UserModel from '../models/user.model';
 import { handleExceptions, ResponseData } from '../utils';
 import { AuthorizationError } from '../utils/error';
 import { generateToken } from '../utils/jwt';
-import { isNullOrEmpty } from '../validations/base.validation';
+import { isValidString } from '../validations/base.validation';
 
 export default class AuthController {
   static async openDeepLink(req: Request, res: Response<ResponseData>) {
@@ -52,7 +52,7 @@ export default class AuthController {
     const { token } = req.cookies;
 
     await handleExceptions(res, async () => {
-      if (isNullOrEmpty(token)) {
+      if (isValidString(token)) {
         throw new AuthorizationError();
       }
 

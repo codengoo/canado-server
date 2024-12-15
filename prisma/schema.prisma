@@ -13,7 +13,7 @@ model Note {
   content   String       @default("")
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
-  state     NoteType     @default(ON_GOING)
+  status    NoteType     @default(ON_GOING)
   owner     User         @relation(fields: [userId], references: [id])
   userId    String       @db.ObjectId
   tags      String[]     @default([])
@@ -32,7 +32,6 @@ enum NotePriority {
   LOW
   MEDIUM
   HIGH
-  URGENT
 }
 
 type NoteItem {

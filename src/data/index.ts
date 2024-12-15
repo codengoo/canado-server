@@ -1,6 +1,12 @@
-export enum ENoteState {
+export enum ENoteStatus {
   ON_GOING = 'ON_GOING',
   COMPLETED = 'COMPLETED',
+}
+
+export enum ENotePriority {
+  HIGH = 'HIGH',
+  MEDIUM = 'MEDIUM',
+  LOW = 'LOW',
 }
 
 export interface IUser {

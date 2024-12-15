@@ -1,13 +1,21 @@
 import database from '../configs/database';
-import { ENoteState } from '../data';
+import { ENoteStatus } from '../data';
+import {
+  ICreateNotePayload,
+  IDeleteNotePayload,
+  IUpdateNotePayload,
+} from '../types/note';
 
 export default class NoteModel {
-  static async createNote(title: string, content: string, id: string) {
+  static async createNote(payload: ICreateNotePayload & { userId: string }) {
+    const { content, folderId, title, userId, priority } = payload;
     const note = await database.note.create({
       data: {
         title,
         content,
-        userId: id,
+        userId,
+        folderId,
+        priority,
       },
     });
 
@@ -15,13 +23,13 @@ export default class NoteModel {
   }
 
   static async getNotes(
-    state?: ENoteState,
+    status?: ENoteStatus,
     offset: number = 0,
     limit: number = 100,
   ) {
     const notes = await database.note.findMany({
       where: {
-        state: state ? (state as any).toUpperCase() : undefined,
+        status: status,
       },
       skip: offset,
       take: limit,
@@ -30,13 +38,28 @@ export default class NoteModel {
     return notes;
   }
 
-  static async updateNoteStatus(id: string, status: ENoteState) {
+  static async updateNote(id: string, payload: IUpdateNotePayload) {
     const note = await database.note.update({
       where: {
         id,
       },
       data: {
-        state: (status as any).toUpperCase(),
+        title: payload.title,
+        content: payload.content,
+        priority: payload.priority,
+        folderId: payload.folderId,
+        status: payload.status,
+      },
+    });
+
+    return note;
+  }
+
+  static async deleteNote(id: string, payload: IDeleteNotePayload) {
+    const note = await database.note.delete({
+      where: {
+        id,
+        userId: payload.userId,
       },
     });
 

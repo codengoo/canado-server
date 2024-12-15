@@ -5,7 +5,8 @@ import checkJwt from '../middlewares/checkJwt';
 const router = Router();
 
 router.get('/', checkJwt, NoteController.getNote);
-router.put('/:id', checkJwt, NoteController.updateNoteStatus);
 router.post('/', checkJwt, NoteController.createNote);
+router.put('/:id', checkJwt, NoteController.updateNote);
+router.delete('/:id', checkJwt, NoteController.deleteNote);
 
 export default router;
